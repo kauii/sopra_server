@@ -40,6 +40,9 @@ public class User implements Serializable {
   private UserStatus status;
 
   @Column(nullable = false)
+  private String password;
+
+  @Column(nullable = false)
   private LocalDateTime creationDate;
 
   public Long getId() {
@@ -81,6 +84,10 @@ public class User implements Serializable {
   public void setStatus(UserStatus status) {
     this.status = status;
   }
+
+  public String getPassword() {  return password; }
+
+  public void setPassword(String password) { this.password = password; }
 
   public LocalDateTime getCreationDate() { return creationDate; }
 

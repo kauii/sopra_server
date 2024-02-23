@@ -43,6 +43,7 @@ public class UserService {
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.OFFLINE);
+    newUser.setPassword(newUser.getPassword());
     newUser.setCreationDate(LocalDateTime.now());
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
@@ -79,12 +80,12 @@ public class UserService {
     }
   }
 
-    public User loginUser(String username, String name) {
+    public User loginUser(String username, String password) {
         // Find user by username
         User existingUser = userRepository.findByUsername(username);
 
         // Check if user exists and the provided password is correct
-        if (existingUser != null && existingUser.getName().equals(name)) {
+        if (existingUser != null && existingUser.getPassword().equals(password)) {
             existingUser.setToken(UUID.randomUUID().toString());
             existingUser.setStatus(UserStatus.ONLINE);
             return existingUser;
