@@ -76,4 +76,19 @@ public class UserService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
     }
   }
+
+    public User loginUser(String username, String name) {
+        // Find user by username
+        User existingUser = userRepository.findByUsername(username);
+
+        // Check if user exists and the provided password is correct
+        if (existingUser != null && existingUser.getName().equals(name)) {
+            existingUser.setToken(UUID.randomUUID().toString());
+            existingUser.setStatus(UserStatus.ONLINE);
+            return existingUser;
+        } else {
+            return null; // return null if login fails
+        }
+    }
+
 }
