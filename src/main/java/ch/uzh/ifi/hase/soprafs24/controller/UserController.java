@@ -60,7 +60,7 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<UserGetDTO> loginUser(@RequestBody UserPostDTO loginDTO) {
         // validate login credentials
-        User loggedInUser = userService.loginUser(loginDTO.getUsername(), loginDTO.getName());
+        User loggedInUser = userService.loginUser(loginDTO.getUsername(), loginDTO.getPassword());
 
         if (loggedInUser != null) {
             // convert internal representation of user to API representation
