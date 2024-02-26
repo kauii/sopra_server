@@ -45,6 +45,8 @@ public class User implements Serializable {
   @Column(nullable = false)
   private LocalDateTime creationDate;
 
+  @Column(nullable = false)
+
   public Long getId() {
     return id;
   }
