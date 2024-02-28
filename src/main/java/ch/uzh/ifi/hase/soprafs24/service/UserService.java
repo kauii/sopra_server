@@ -12,8 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -31,6 +34,8 @@ public class UserService {
 
   private final UserRepository userRepository;
 
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
   @Autowired
   public UserService(@Qualifier("userRepository") UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -42,9 +47,9 @@ public class UserService {
 
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
     newUser.setPassword(newUser.getPassword());
-    newUser.setCreationDate(LocalDateTime.now());
+    newUser.setCreationDate(LocalDateTime.now().format(formatter));
+		newUser.setStatus(UserStatus.ONLINE);
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -80,18 +85,45 @@ public class UserService {
     }
   }
 
-    public User loginUser(String username, String password) {
-        // Find user by username
-        User existingUser = userRepository.findByUsername(username);
+	public User loginUser(String username, String password) {
+	// Find user by username
+		User existingUser = userRepository.findByUsername(username);
 
-        // Check if user exists and the provided password is correct
-        if (existingUser != null && existingUser.getPassword().equals(password)) {
-            existingUser.setToken(UUID.randomUUID().toString());
-            existingUser.setStatus(UserStatus.ONLINE);
-            return existingUser;
-        } else {
-            return null; // return null if login fails
-        }
-    }
+		// Check if user exists and the provided password is correct
+		if (existingUser != null && existingUser.getPassword().equals(password)) {
+				existingUser.setToken(UUID.randomUUID().toString());
+				String lol = existingUser.getToken();
+				System.out.println(lol);;
+				return existingUser;
+		} else {
+				return null; // return null if login fails
+		}
+	}
 
+	public User getUserById(Long userId) {
+		return userRepository.findById(userId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+						String.format("User with ID %d not found", userId)));
+	}
+
+	public void updateStatus(User user, UserStatus status) {
+
+		//checkIfUserExists(user);
+
+		user.setStatus(status);
+		userRepository.save(user);
+	}
+
+	public void updateUser(User user,String username, String birthDate) {
+
+		//checkIfUserExists(user);
+
+		if (username.length() > 0) {
+			user.setUsername(username);
+		}
+		if (birthDate.length() > 0) {
+			LocalDate date = LocalDate.parse(birthDate);
+			user.setBirthDate(date.format(formatter));
+		}
+	}
 }

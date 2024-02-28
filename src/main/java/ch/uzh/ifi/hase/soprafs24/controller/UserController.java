@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserUpdateDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static ch.uzh.ifi.hase.soprafs24.constant.UserStatus.OFFLINE;
+import static ch.uzh.ifi.hase.soprafs24.constant.UserStatus.ONLINE;
 
 /**
  * User Controller
@@ -63,6 +67,8 @@ public class UserController {
         User loggedInUser = userService.loginUser(loginDTO.getUsername(), loginDTO.getPassword());
 
         if (loggedInUser != null) {
+						// Update the user status to online
+						userService.updateStatus(loggedInUser, ONLINE);
             // convert internal representation of user to API representation
             UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(loggedInUser);
             return ResponseEntity.ok(userGetDTO);
@@ -70,5 +76,54 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+	@PostMapping("users/{id}/logout")
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public ResponseEntity<String> logoutUser(@PathVariable Long id) {
+		try {
+			// Retrieve the user from the database
+			User user = userService.getUserById(id);
+
+			if (user != null) {
+				System.out.println(user.getUsername());
+				// Update the user status to offline
+				userService.updateStatus(user, OFFLINE);
+
+				return ResponseEntity.ok("User logged out successfully");
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during logout");
+		}
+	}
+
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponseEntity<UserGetDTO> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO updateDTO) {
+        try {
+            // Check if the user with the provided ID exists
+            User existingUser = userService.getUserById(id);
+
+            if (existingUser != null) {
+                // Update the user with the new birthdate
+								System.out.println("Token: " + existingUser.getToken());
+								System.out.println(updateDTO.getBirthDate());
+                userService.updateUser(existingUser, updateDTO.getUsername(), updateDTO.getBirthDate());
+
+                // Convert the updated user to API representation
+                UserGetDTO updatedUserDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(existingUser);
+
+                return ResponseEntity.ok(updatedUserDTO);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
 

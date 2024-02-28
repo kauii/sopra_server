@@ -2,9 +2,6 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class UserGetDTO {
 
@@ -13,8 +10,10 @@ public class UserGetDTO {
   private String username;
   private UserStatus status;
   private String password;
-  private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
   private String creationDate;
+
+	private String birthDate;
+	private String token;
 
   public Long getId() {
     return id;
@@ -54,7 +53,20 @@ public class UserGetDTO {
 
   public String getCreationDate() { return creationDate; }
 
-  public void setCreationDate(LocalDateTime creationDate) {
-      this.creationDate = creationDate.format(formatter);
+  public void setCreationDate(String creationDate) {
+      this.creationDate = creationDate;
   }
+
+	public String getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(String birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	public String getToken() { return token; }
+
+	public void setToken(String token) { this.token = token; }
+
 }
