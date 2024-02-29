@@ -108,15 +108,12 @@ public class UserService {
 
 	public void updateStatus(User user, UserStatus status) {
 
-		//checkIfUserExists(user);
 
 		user.setStatus(status);
 		userRepository.save(user);
 	}
 
 	public void updateUser(User user,String username, String birthDate) {
-
-		//checkIfUserExists(user);
 
 		if (username.length() > 0) {
 			user.setUsername(username);

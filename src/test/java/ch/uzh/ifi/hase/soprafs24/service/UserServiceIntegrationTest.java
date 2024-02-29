@@ -11,6 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -42,6 +45,8 @@ public class UserServiceIntegrationTest {
     User testUser = new User();
     testUser.setName("testName");
     testUser.setUsername("testUsername");
+		testUser.setPassword("psw");
+		//testUser.setCreationDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
     // when
     User createdUser = userService.createUser(testUser);
@@ -51,7 +56,7 @@ public class UserServiceIntegrationTest {
     assertEquals(testUser.getName(), createdUser.getName());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
-    assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
+    assertEquals(UserStatus.ONLINE, createdUser.getStatus()); // change UserStatus.OFFLINE to ONLINE
   }
 
   @Test
@@ -61,6 +66,7 @@ public class UserServiceIntegrationTest {
     User testUser = new User();
     testUser.setName("testName");
     testUser.setUsername("testUsername");
+		testUser.setPassword("psw");
     User createdUser = userService.createUser(testUser);
 
     // attempt to create second user with same username
