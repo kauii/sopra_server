@@ -99,29 +99,37 @@ public class UserController {
 		}
 	}
 
-    @PostMapping("/users/{id}")
+    @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponseEntity<?> getUser(@PathVariable Long id) {
+        try {
+            User user = userService.getUserById(id);
+            UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+            return ResponseEntity.ok(userGetDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+    }
+
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @ResponseBody
     public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserPostDTO postDTO) {
         try {
             // Check if the user with the provided ID exists
             User existingUser = userService.getUserById(id);
 
-            if (existingUser != null) {
-								System.out.println("Token: " + existingUser.getToken());
-								System.out.println(postDTO.getBirthDate());
-                userService.updateUser(existingUser, postDTO.getUsername(), postDTO.getBirthDate());
+            System.out.println("Token: " + existingUser.getToken());
+            System.out.println(postDTO.getBirthDate());
+            userService.updateUser(existingUser, postDTO.getUsername(), postDTO.getBirthDate());
 
-                // Convert the updated user to API representation
-                DTOMapper.INSTANCE.convertEntityToUserGetDTO(existingUser);
+            // Convert the updated user to API representation
+            DTOMapper.INSTANCE.convertEntityToUserGetDTO(existingUser);
 
-                return ResponseEntity.ok("Changes saved successfully.");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-            }
+            return ResponseEntity.ok("Changes saved successfully.");
         } catch (Exception e) {
-						System.out.println(e.toString());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Username already exists.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
 
