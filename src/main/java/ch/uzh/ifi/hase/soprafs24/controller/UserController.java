@@ -3,7 +3,6 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserUpdateDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -86,7 +85,6 @@ public class UserController {
 			User user = userService.getUserById(id);
 
 			if (user != null) {
-				System.out.println(user.getUsername());
 				// Update the user status to offline
 				userService.updateStatus(user, OFFLINE);
 
@@ -102,15 +100,11 @@ public class UserController {
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<?> getUser(@PathVariable Long id) {
-        try {
-            User user = userService.getUserById(id);
-            UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
-            return ResponseEntity.ok(userGetDTO);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        }
-    }
+		public ResponseEntity<UserGetDTO> getUser(@PathVariable Long id) {
+			User user = userService.getUserById(id);
+			UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+			return ResponseEntity.ok(userGetDTO);
+		}
 
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -127,7 +121,7 @@ public class UserController {
             // Convert the updated user to API representation
             DTOMapper.INSTANCE.convertEntityToUserGetDTO(existingUser);
 
-            return ResponseEntity.ok("Changes saved successfully.");
+            return ResponseEntity.accepted().body("Changes saved successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }

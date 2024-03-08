@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -87,8 +86,6 @@ public class UserService {
 		// Check if user exists and the provided password is correct
 		if (existingUser != null && existingUser.getPassword().equals(password)) {
 				existingUser.setToken(UUID.randomUUID().toString());
-				String lol = existingUser.getToken();
-				System.out.println(lol);;
 				return existingUser;
 		} else {
 				return null; // return null if login fails
@@ -102,8 +99,6 @@ public class UserService {
 	}
 
 	public void updateStatus(User user, UserStatus status) {
-
-
 		user.setStatus(status);
 		userRepository.save(user);
 	}
